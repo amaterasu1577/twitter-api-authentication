@@ -1,5 +1,7 @@
+import uuid
 from datetime import datetime
 from sqlalchemy.schema import ForeignKey
+from sqlalchemy.event import listen
 
 from app import db
 
@@ -24,3 +26,10 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<User {self.username}>"
+
+    def generate_api_key(self):
+        if not self.api_key:
+            self.api_key = str(uuid.uuid4())
+        return self.api_key
+
+listen(User, 'before_insert', generate_api_key)
